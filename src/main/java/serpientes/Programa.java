@@ -1,6 +1,5 @@
 package serpientes;
 
-import java.util.Arrays;
 import java.util.Random;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
@@ -16,17 +15,19 @@ public class Programa {
     public static final ImageIcon ICONO = new ImageIcon("src/main/resources/snake_96x.jpg");
     public static final int NMAX = 100;
 
-    //Declaracion de array para datos de temperatura
-    public static int[] lectura;
+    //Declaracion de variables
+    public static String lectura = "";
+    public static int n, k;
+    public static Candidato[] candidato;
 
     //Método main con estructura lógica principal del programa
     public static void main(String[] args) {
         do {
-            int n = solicitaDato("cantidad de mediciones de temperatura. (1-" + NMAX + ")", 1, NMAX);
-            lectura = new int[n];
-            int k = solicitaDato("número de mediciones soportadas bajo umbral de temperatura. (0-" + n + ")", 0, n);
+            n = solicitaDato("cantidad de mediciones de temperatura. (1-" + NMAX + ")", 1, NMAX);
+            k = solicitaDato("número de mediciones soportadas bajo umbral de temperatura. (0-" + n + ")", 0, n);
             tipoListado(n);
-            buscaOptimo();
+            creaCandidatos();
+            limpiaCandidatos();
         } while (!menuSalir());
 
     }
@@ -96,30 +97,80 @@ public class Programa {
                     break;
             }
         } while (opcion != 0 && opcion != 1);
+
+        String mensaje = "<html>Las mediciones obtenidas son:<br/>"
+                + "<p align='center'>" + lectura + "</p></html>";
+        JOptionPane.showOptionDialog(
+                null,
+                new JLabel(mensaje),
+                "Mediciones",
+                JOptionPane.YES_NO_CANCEL_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                ICONO,
+                new Object[]{"Ok"}, "Ok");
     }
 
     //Método para introducir listado manualmente
     public static void listadoManual(int n) {
-        for (int i = 0; i < lectura.length - 1; i++) {
-            solicitaDato("valor de temperatura " + i + ":"
+        for (int i = 0; i < n; i++) {
+            lectura = lectura + solicitaDato("medición de temperatura " + (i + 1) + ":\n"
                     + "\n0 para temperatura bajo umbral soportado."
                     + "\n1 para temperatura sobre umbral soportado.", 0, 1);
         }
-        //System.out.println(Arrays.toString(lectura));
     }
 
     //Método para introducir listado aleatoriamente
     public static void listadoRandom(int n) {
         Random random = new Random();
-        for (int i = 0; i < lectura.length - 1; i++) {
-            lectura[i] = random.nextInt(2);
+        for (int i = 0; i < n; i++) {
+            lectura = lectura + random.nextInt(2);
         }
-        System.out.println(Arrays.toString(lectura));
     }
 
-    //Método de búsqueda de secuencia óptima de temperatura
-    public static void buscaOptimo() {
+    //Inicializa el array de candidatos, busca k+1 ceros consecutivos y parte lecturas
+    public static void creaCandidatos() {
+        candidato = new Candidato[n / k];
+        String ceros = "";
+        for (int i = 0; i < k + 1; i++) {
+            ceros = ceros + 0;
+        }
+        String[] partes = lectura.split(ceros);
+        int i = 0;
+        for (String parte : partes) {
+            candidato[i] = new Candidato();
+            candidato[i].setSubstring(parte);
+            i++;
+        }
+        int indice = 0;
+        String tmp;
+        for (int j = 0; j < candidato.length; j++) {
+            if (candidato[j] != null) {
+                candidato[j].setIndice(lectura.indexOf(candidato[j].getSubstring(), indice));
+                tmp = candidato[j].getSubstring();
+                candidato[j].setLongitud(tmp.length());
+                indice = candidato[j].getLongitud() + candidato[j].getIndice();
+            }
+        }
 
+//        for (int j = 0; j < candidato.length; j++) {
+//            if (candidato[j] != null) {
+//                System.out.println(candidato[j].getSubstring());
+//                System.out.println(candidato[j].getIndice());
+//                System.out.println(candidato[j].getLongitud());
+//            }
+//        }
+    }
+    
+    public static void limpiaCandidatos(){
+        for (int i = 0; i < candidato.length; i++) {
+                if (candidato[i] != null) {
+                    while (candidato[i].getSubstring().charAt(0) == '0'){
+                        candidato[i].setSubstring(candidato[i].getSubstring().substring(1));
+                        candidato[i].setIndice(candidato[i].getIndice()+1);
+                        candidato[i].setLongitud(candidato[i].getLongitud()-1);
+                    }
+                }
+            }
     }
 
     //Ventana de confirmación de saida del programa
