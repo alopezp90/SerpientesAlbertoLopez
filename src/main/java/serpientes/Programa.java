@@ -1,5 +1,7 @@
 package serpientes;
 
+import java.util.Arrays;
+import java.util.Random;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.JLabel;
@@ -21,6 +23,7 @@ public class Programa {
     public static void main(String[] args) {
         do {
             int n = solicitaDato("cantidad de mediciones de temperatura. (1-" + NMAX + ")", 1, NMAX);
+            lectura = new int[n];
             int k = solicitaDato("número de mediciones soportadas bajo umbral de temperatura. (0-" + n + ")", 0, n);
             tipoListado(n);
             buscaOptimo();
@@ -30,7 +33,7 @@ public class Programa {
 
     //Método para solicitud de datos por teclado
     public static int solicitaDato(String mensaje, int min, int max) {
-        int valor;
+        int valor = max + 1;     //valor inicializado fuera del rango del bucle para repetir lo por defecto
         do {
             Object objeto = JOptionPane.showInputDialog(null,
                     "Introduce " + mensaje,
@@ -39,22 +42,23 @@ public class Programa {
                     ICONO,
                     null,
                     null);
-            String texto = objeto.toString();
-            if (isParsable(texto)) {
-                valor = Integer.parseInt(texto);
-            } else {
-                valor = max + 1;    //Si no se puede parsear como int da un valor fuera del rango, para repetir el bucle
-            }
-            if (valor < min || valor > max) {   //Mensaje de error cuando el dato esta fuera del rango
-                JOptionPane.showOptionDialog(
-                        null,
-                        "El valor introducino no es válido.\n"
-                        + "Valores válidos: " + min + "-" + max + ".",
-                        "ERROR",
-                        JOptionPane.DEFAULT_OPTION,
-                        JOptionPane.ERROR_MESSAGE,
-                        ICONO,
-                        new Object[]{"Ok"}, null);
+            if (objeto != null) {       //Obliga a introducir algun valor, no permite salida con "cancelar" o cerrar ventana
+                String texto = objeto.toString();
+                if (isParsable(texto)) {
+                    valor = Integer.parseInt(texto);
+                }
+
+                if (valor < min || valor > max) {   //Mensaje de error cuando el dato esta fuera del rango
+                    JOptionPane.showOptionDialog(
+                            null,
+                            "El valor introducino no es válido.\n"
+                            + "Valores válidos: " + min + "-" + max + ".",
+                            "ERROR",
+                            JOptionPane.DEFAULT_OPTION,
+                            JOptionPane.ERROR_MESSAGE,
+                            ICONO,
+                            new Object[]{"Ok"}, "Ok");
+                }
             }
         } while (valor < min || valor > max);
         return valor;
@@ -81,7 +85,7 @@ public class Programa {
                     JOptionPane.YES_NO_CANCEL_OPTION,
                     JOptionPane.QUESTION_MESSAGE,
                     ICONO,
-                    new Object[]{"Manualmente", "Aleatorios"}, null);
+                    new Object[]{"Manualmente", "Aleatorios"}, "Aleatorios");
 
             switch (opcion) {
                 case 0:
@@ -96,12 +100,21 @@ public class Programa {
 
     //Método para introducir listado manualmente
     public static void listadoManual(int n) {
-
+        for (int i = 0; i < lectura.length - 1; i++) {
+            solicitaDato("valor de temperatura " + i + ":"
+                    + "\n0 para temperatura bajo umbral soportado."
+                    + "\n1 para temperatura sobre umbral soportado.", 0, 1);
+        }
+        //System.out.println(Arrays.toString(lectura));
     }
 
     //Método para introducir listado aleatoriamente
     public static void listadoRandom(int n) {
-
+        Random random = new Random();
+        for (int i = 0; i < lectura.length - 1; i++) {
+            lectura[i] = random.nextInt(2);
+        }
+        System.out.println(Arrays.toString(lectura));
     }
 
     //Método de búsqueda de secuencia óptima de temperatura
@@ -119,7 +132,7 @@ public class Programa {
                 JOptionPane.QUESTION_MESSAGE,
                 ICONO,
                 new Object[]{"Repetir", "Salir"}, null);
-        
+
         return opcion != 0;     //true para salir, false para repetir
     }
 }
