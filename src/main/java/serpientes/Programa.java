@@ -91,7 +91,7 @@ public class Programa {
                     listadoRandom(n);
                     break;
             }
-        } while (opcion == 0 || opcion == 1);
+        } while (opcion != 0 && opcion != 1);
     }
 
     //Método para introducir listado manualmente
