@@ -225,7 +225,7 @@ public class Programa {
      * hubiera se queda guardado en los substrings, este metodo los repasa y
      * cambia su indice y longitud en consecuencia.
      */
-    //este metodo, de nuevo, es muy ineficiente, no deberia ser necesario si creaCandidatos() fuera mejor.
+    //este metodo no deberia ser necesario si creaCandidatos() fuera mejor.
     public static void limpiaCandidatos() {
         for (int i = 0; i < candidato.length; i++) {
             if (candidato[i] != null) {
