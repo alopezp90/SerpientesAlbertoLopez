@@ -33,6 +33,8 @@ public class Programa {
     public static void main(String[] args) {
         //bucle para repetir el programa mientras el usuario lo desee
         do {
+            
+            //DATOS
             //inicializa vacio el String en cada vuelta
             lectura = "";
             //solicita los parametros n y k mediante el metodo solicitaDato()
@@ -40,12 +42,20 @@ public class Programa {
             k = solicitaDato("número de mediciones soportadas bajo umbral de temperatura. (0-" + n + ")", 0, n);
             //da opcion al usuario a introducir manualmente el String o aleatoriamente
             tipoListado(n);
+            //-----------------------------------------------------------------
+            
+            //CORTA STRING
             //inicializa el array de Candidato y guarda en el las subcadenas posibles
             creaCandidatos();
             //quita los ceros iniciales y finales que han podido quedar en los substring
             limpiaCandidatos();
+            //-----------------------------------------------------------------
+            
+            //SOLUCION
             //busca entre los candidatos el optimo y muestra la solucion
             resultado();
+            //-----------------------------------------------------------------
+            
             //permite al usuario repetir la ejecucion o no
         } while (!menuSalir());
 
@@ -188,7 +198,7 @@ public class Programa {
      */
     public static void creaCandidatos() {
         //inicializa el array de Candidato
-        candidato = new Candidato[n];
+        candidato = new Candidato[n / k];//ANTERIORMENTE n
         //crea la cadena de k+1 ceros
         String ceros = "";
         for (int i = 0; i < k + 1; i++) {
